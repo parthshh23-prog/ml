@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>For you ml🫀</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: radial-gradient(circle at top, #ffe6f0 0%, #f7d9e6 35%, #f2dfcc 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: align-items 0.25s ease, padding-top 0.25s ease, background 0.25s ease;
+      }
+
+      /* A4 portrait ratio: 1 : 1.414 */
+      main {
+        width: min(100%, 420px);
+        margin: 0 auto;
+        padding: 16px;
+        aspect-ratio: 1 / 1.414; /* width : height (A4 portrait) */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .player-container {
+        background: linear-gradient(145deg, #fff7fb 0%, #fffdfb 40%, #fff2f5 100%);
+        border-radius: 26px;
+        padding: 20px 18px;
+        box-shadow: 0 16px 45px rgba(139, 30, 45, 0.25);
+        text-align: center;
+        border: 1px solid rgba(139, 30, 45, 0.08);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto; /* scroll inside the card instead of shrinking content */
+      }
+
+      h1 {
+        font-size: 14px;
+        letter-spacing: 4px;
+        color: #8b1e2d;
+        margin: 0 0 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      /* Top row holding album art + title */
+      .top-row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .album-art {
+        width: 210px;
+        height: 210px;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+        position: relative;
+        border: 2px solid rgba(255, 190, 210, 0.8);
+        flex-shrink: 0; /* never shrink album art */
+        transition: width 0.25s ease, height 0.25s ease, border-radius 0.25s ease;
+      }
+
+      .album-art::after {
+        content: "♡";
+        position: absolute;
+        bottom: 10px;
+        right: 12px;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.35);
+      }
+
+      .album-art img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .song-info {
+        margin: 4px 0 0;
+      }
+
+      .song-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5b1020;
+        margin: 0 0 2px;
+      }
+
+      .song-artist {
+        font-size: 13px;
+        color: #7b3b4f;
+        opacity: 0.8;
+        margin: 0;
+      }
+
+      /* Toggles row */
+      .toggles-row {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 14px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+
+      .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: #8b1e2d;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .toggle-label-text {
+        white-space: nowrap;
+      }
+
+      .toggle {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 18px;
+      }
+
+      .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #f0d0da;
+        transition: 0.2s;
+        border-radius: 999px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 2px;
+        top: 2px;
+        background-color: white;
+        transition: 0.2s;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .toggle input:checked + .slider {
+        background-color: #d76389;
+      }
+
+      .toggle input:checked + .slider:before {
+        transform: translateX(16px);
+      }
+
+      /* Lyrics section */
+      .lyrics-section {
+        margin-top: 10px;
+        padding: 10px 8px;
+        background: #ffeaf1;
+        border-radius: 16px;
+        max-height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden; /* no horizontal scroll */
+        text-align: left;
+        flex-shrink: 0;
+      }
+
+      .lyrics-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #8b1e2d;
+        margin-bottom: 4px;
+        opacity: 0.95;
+      }
+
+      .lyrics-container {
+        font-size: 13px;
+        line-height: 1.5;
+        overflow-x: hidden;
+        word-wrap: break-word;
+      }
+
+      .lyric-line {
+        margin-bottom: 3px;
+        opacity: 0.75;
+        cursor: default;
+        transition: all 0.15s ease;
+      }
+
+      .lyric-line.synced {
+        cursor: pointer;
+      }
+
+      .lyric-line.synced:hover {
+        opacity: 0.95;
+        transform: translateX(2px);
+      }
+
+      .lyric-line.active {
+        font-weight: 600;
+        opacity: 1;
+        transform: scale(1.01);
+      }
+
+      .lyrics-empty {
+        font-size: 12px;
+        opacity: 0.7;
+        font-style: italic;
+      }
+
+      /* Feels like us / you section */
+      .why-section {
+        margin-top: 8px;
+        padding: 10px 10px 8px;
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px dashed rgba(139, 30, 45, 0.35);
+        text-align: left;
+        flex-shrink: 0;
+        overflow-x: hidden;
+      }
+
+      .why-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #8b1e2d;
+        margin-bottom: 6px;
+      }
+
+      .why-text {
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #4a1d2c;
+        opacity: 0.94;
+        word-wrap: break-word;
+      }
+
+      /* Bottom controls pinned to bottom */
+      .bottom-controls {
+        margin-top: auto;
+        flex-shrink: 0;
+      }
+
+      .progress-container {
+        margin: 16px 0 10px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #f5d7df;
+        border-radius: 999px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #d75b7a, #8b1e2d);
+        border-radius: 999px;
+        transition: width 0.1s linear;
+      }
+
+      .time-display {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 11px;
+        color: #7b3b4f;
+        opacity: 0.8;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .control-btn {
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .control-btn:focus {
+        outline: 2px solid #8b1e2d;
+        outline-offset: 2px;
+      }
+
+      .prev-btn,
+      .next-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #e2b7c3;
+        background: rgba(255, 247, 250, 0.9);
+        font-size: 16px;
+        color: #8b1e2d;
+      }
+
+      .prev-btn:hover,
+      .next-btn:hover {
+        background: #ffe6ee;
+        border-color: #d76389;
+        transform: translateY(-1px);
+      }
+
+      .play-btn {
+        width: 58px;
+        height: 58px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #ffdfeb, #c71e4c);
+        color: #ffffff;
+        font-size: 22px;
+        box-shadow: 0 6px 18px rgba(139, 30, 45, 0.45);
+      }
+
+      .play-btn:hover {
+        transform: scale(1.05) translateY(-1px);
+      }
+
+      .play-btn:active {
+        transform: scale(0.97) translateY(0);
+      }
+
+      .description {
+        font-size: 12px;
+        color: #7b3b4f;
+        opacity: 0.8;
+        margin-top: 10px;
+        line-height: 1.5;
+        padding: 0 6px;
+      }
+
+      .error-message {
+        background: #fff3cd;
+        border: 1px solid #ffe69c;
+        border-radius: 8px;
+        padding: 8px;
+        margin-top: 8px;
+        font-size: 11px;
+        color: #856404;
+        display: none;
+      }
+
+      /* -------------------- SHARED MAIN MODES (lyrics / feels) -------------------- */
+
+      body.lyrics-main-mode .player-container,
+      body.feels-main-mode .player-container {
+        text-align: left;
+        background: radial-gradient(circle at top left, #f7dce9 0%, #f9eaf3 35%, #fff5f8 100%);
+      }
+
+      body.lyrics-main-mode .top-row,
+      body.feels-main-mode .top-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      body.lyrics-main-mode .album-art,
+      body.feels-main-mode .album-art {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+
+      body.lyrics-main-mode .song-title,
+      body.feels-main-mode .song-title {
+        font-size: 16px;
+        margin-bottom: 2px;
+      }
+
+      body.lyrics-main-mode .song-artist,
+      body.feels-main-mode .song-artist {
+        font-size: 12px;
+      }
+
+      /* Lyrics main mode (Apple-style) */
+      body.lyrics-main-mode .lyrics-section {
+        background: transparent;
+        border-radius: 0;
+        max-height: none;
+        flex: 1; /* take all middle space */
+        margin-top: 18px;
+        padding: 0;
+      }
+
+      body.lyrics-main-mode .lyrics-title {
+        display: none;
+      }
+
+      body.lyrics-main-mode .lyrics-container {
+        font-size: 20px;
+        line-height: 1.6;
+        color: #3c1224;
+        font-weight: 600;
+      }
+
+      body.lyrics-main-mode .lyric-line {
+        margin-bottom: 8px;
+        opacity: 0.9;
+      }
+
+      body.lyrics-main-mode .lyric-line.active {
+        opacity: 1;
+        text-shadow: 0 0 14px rgba(255, 192, 203, 0.9);
+      }
+
+      /* Feels main mode */
+      body.feels-main-mode .lyrics-section {
+        display: none !important;
+      }
+
+      body.feels-main-mode .why-section {
+        background: transparent;
+        border-radius: 0;
+        border: none;
+        flex: 1;
+        margin-top: 18px;
+        padding: 0;
+      }
+
+      body.feels-main-mode .why-title {
+        display: none;
+      }
+
+      body.feels-main-mode .why-text {
+        font-size: 19px;
+        line-height: 1.7;
+        color: #3a1023;
+        font-weight: 600;
+        white-space: pre-wrap;
+      }
+
+      body.lyrics-main-mode .bottom-controls,
+      body.feels-main-mode .bottom-controls {
+        margin-top: 18px;
+      }
+    </style>
+    <style>
+      @view-transition {
+        navigation: auto;
+      }
+    </style>
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+    <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+    <script
+      src="https://cdn.tailwindcss.com"
+      type="text/javascript"
+    ></script>
+  </head>
+  <body>
+    <main>
+      <div class="player-container">
+        <h1></h1>
+
+        <!-- TOP: album art + song info -->
+        <div class="top-row">
+          <div class="album-art">
+            <img
+              id="albumArt"
+              src="1.jpg"
+              alt="Album artwork"
+              onerror="this.src=''; this.alt='Album art unavailable'; this.style.background='linear-gradient(135deg, #8B1E2D, #C94A5A)'; this.style.display='block';"
+            />
+          </div>
+
+          <div class="song-info">
+            <h2 class="song-title" id="songTitle">I Want To Hold Your Hand</h2>
+            <p class="song-artist" id="songArtist">The Beatles</p>
+          </div>
+        </div>
+
+        <!-- Toggles -->
+        <div class="toggles-row">
+          <div class="toggle-wrapper">
+            <span class="toggle-label-text">Lyrics</span>
+            <label class="toggle">
+              <input type="checkbox" id="lyricsToggle" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-wrapper">
+            <span class="toggle-label-text">Feels like us</span>
+            <label class="toggle">
+              <input type="checkbox" id="whyToggle" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Lyrics section -->
+        <div class="lyrics-section" id="lyricsSection">
+          <div class="lyrics-title">Lyrics</div>
+          <div class="lyrics-container" id="lyricsContainer">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <!-- Feels like us / you -->
+        <div class="why-section" id="whySection">
+          <div class="why-title">Why it feels like us/you</div>
+          <p class="why-text" id="whyText">
+            Add your little note here about why this song feels like “us/you”.
+          </p>
+        </div>
+
+        <!-- Bottom controls -->
+        <div class="bottom-controls">
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">0:00</span>
+              <span id="duration">0:00</span>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button
+              class="control-btn prev-btn"
+              id="prevBtn"
+              aria-label="Previous song"
+            >
+              ‹
+            </button>
+            <button
+              class="control-btn play-btn"
+              id="playBtn"
+              aria-label="Play"
+            >
+              ►
+            </button>
+            <button
+              class="control-btn next-btn"
+              id="nextBtn"
+              aria-label="Next song"
+            >
+              ›
+            </button>
+          </div>
+
+          <p class="description"></p>
+
+          <div class="error-message" id="errorMessage">
+            Audio files not found. The player will show the song information, but
+            playback requires the audio files.
+          </div>
+        </div>
+      </div>
+
+      <audio id="audioPlayer"></audio>
+    </main>
+
+    <script>
+      /* ---------------------------------------------
+         EASY EDIT: FEELS LIKE US/YOU TEXT PER SONG
+         --------------------------------------------- */
+
+      const feelingsByTitle = {
+        "I Want To Hold Your Hand - Remastered 2015":
+          "Because this is literally how it feels with you — that constant\n“I just want to be next to you and hold your hand” feeling, all the time.",
+        "Can't Help Falling In Love":
+          "Soft, slow and kind of inevitable — like no matter what we do,\nI still end up falling in love with you again and again.",
+        "My Girl (She's Like Heaven To Me)":
+          "That ‘she’s like heaven to me’ line? That’s just you.\nYour smile, your chaos, your softness — everything feels a little better with you in it.",
+        "Swag Ka Vikreta":
+          "This is our playful side — teasing, hyped, dramatic for no reason,\nand still somehow holding hands through all the madness.",
+        "Until I Found You":
+          "That “I would never fall in love again until I found her” energy:\nI was fine alone, but now I don’t even want to imagine anyone else."
+      };
+
+      /*
+        Songs with synced lyrics (tap to seek):
+        - I Want To Hold Your Hand
+        - Until I Found You
+      */
+
+      const playlist = [
+        {
+          title: "I Want To Hold Your Hand - Remastered 2015",
+          artist: "The Beatles",
+          src: "i-want-to-hold-your-hand-remastered-2015.mp3",
+          cover: "1.jpg", // 👈 album art
+          synced: true,
+          lyrics: [
+            { time: 7.12, text: "Oh yeah, I'll tell you somethin'" },
+            { time: 11.34, text: "I think you'll understand" },
+            { time: 13.92, text: "When I say that somethin'" },
+            { time: 18.33, text: "I want to hold your hand" },
+            { time: 22.31, text: "I want to hold your hand" },
+            { time: 25.94, text: "I want to hold your hand" },
+            { time: 28.58, text: "Oh please, say to me" },
+            { time: 32.8, text: "You'll let me be your man" },
+            { time: 35.78, text: "And please, say to me" },
+            { time: 40.29, text: "You'll let me hold your hand" },
+            { time: 43.55, text: "Now let me hold your hand" },
+            { time: 47.75, text: "I want to hold your hand" },
+            { time: 51.3, text: "And when I touch you" },
+            { time: 53.45, text: "I feel happy inside" },
+            { time: 58.52, text: "It's such a feelin' that my love" },
+            { time: 63.19, text: "I can't hide, I can't hide" },
+            { time: 66.66, text: "I can't hide" },
+            { time: 70.43, text: "Yeah, you got that somethin'" },
+            { time: 75.03, text: "I think you'll understand" },
+            { time: 77.85, text: "When I'll say that sometimes" },
+            { time: 82.18, text: "I want to hold your hand" },
+            { time: 86.15, text: "I want to hold your hand" },
+            { time: 89.39, text: "I want to hold your hand" },
+            {
+              time: 93.35,
+              text: "And when I touch you, I feel happy inside",
+            },
+            { time: 101.05, text: "It's such a feelin' that my love" },
+            { time: 105.89, text: "I can't hide, I can't hide" },
+            { time: 109.1, text: "I can't hide" },
+            { time: 112.95, text: "Yeah, you got that somethin'" },
+            { time: 117.55, text: "I think you'll understand" },
+            { time: 120.11, text: "When I feel that somethin'" },
+            { time: 125.03, text: "I want to hold your hand" },
+            { time: 128.66, text: "I want to hold your hand" },
+            { time: 132.15, text: "I want to hold your hand" },
+            { time: 135.95, text: "I want to hold your hand" },
+          ],
+        },
+        {
+          title: "Can't Help Falling In Love",
+          artist: "Elvis Presley",
+          src: "Can-T-Help-Falling-In-Love.mp3",
+          cover: "3.jpg",
+          synced: false,
+          lyrics: [
+            "Wise men say",
+            "Only fools rush in",
+            "But I can't help falling in love with you",
+            "Shall I stay?",
+            "Would it be a sin",
+            "If I can't help falling in love with you?",
+            "",
+            "Like a river flows",
+            "Surely to the sea",
+            "Darling, so it goes",
+            "Some things are meant to be",
+            "Take my hand,",
+            "Take my whole life, too",
+            "For I can't help falling in love with you",
+            "",
+            "Like a river flows",
+            "Surely to the sea",
+            "Darling, so it goes",
+            "Some things are meant to be",
+            "Take my hand,",
+            "Take my whole life, too",
+            "For I can't help falling in love with you",
+            "For I can't help falling in love with you",
+          ],
+        },
+        {
+          title: "My Girl (She's Like Heaven To Me)",
+          artist: "My Girl",
+          src: "my-girl-shes-like-heaven-to-me.mp3",
+          cover: "4.jpg",
+          synced: false,
+          lyrics: [
+            "My girl",
+            "She's like heaven to me",
+            "My girl",
+            "She's so fine",
+            "",
+            "My girl",
+            "She is everything to me",
+            "She's beautiful",
+            "And I'm so glad she's mine",
+            "",
+            "My girl",
+            "When she smiles I melt away",
+            "My girl",
+            "Shes sugar and spice",
+            "",
+            "My girl",
+            "Yeah she really makes my day",
+            "And I'm so glad she's finally looked my way",
+            "",
+            "Loving you",
+            "Being close to you is like a dream come true",
+            "Cos everything you do",
+            "And everything you say",
+            "It feels so good, feels so right",
+            "Right in every way",
+            "",
+            "My girl",
+            "Yeah she knows just what to do",
+            "My girl",
+            "Beautiful eyes",
+            "My girl",
+            "She takes time to get it right",
+            "Gotta be with her",
+            "Everyday and night",
+            "",
+            "Loving you",
+            "Being close to you is like a dream come true",
+            "Cos everything you do",
+            "And everything you say",
+            "It feels so good, feels so right",
+            "Right in every way",
+            "",
+            "I can't stand it",
+            "If we're apart too long",
+            "Well I go to pieces",
+            "Together we belong",
+            "",
+            "That's why I'm saying",
+            "Loving you",
+            "Being close to you is like a dream come true",
+            "Cos everything you do",
+            "And everything you say",
+            "It feels so good, feels so right",
+            "Right in every way",
+            "",
+            "Loving you",
+            "Being close to you is like a dream come true",
+            "Cos everything you do",
+            "And everything you say",
+            "It feels so good, feels so right",
+            "Right in every way",
+          ],
+        },
+        {
+          title: "Swag Ka Vikreta",
+          artist: "King",
+          src: "swag-ka-vikreta.mp3",
+          cover: "6.jpg",
+          synced: false,
+          lyrics: [
+            "Abey, dil phaink ke maarunga har taraf",
+            "Shayad tumhare siva kahin aur lag jaaye",
+            "God mein jagah de, sirhaana bana de",
+            "Mere man mein hai shor",
+            "Shor, shor, shor",
+            "Mere man mein hai shor",
+            "Mama, I'm a wild child",
+            "So hold my hand",
+            "(Hold my hand, mama, hold my hand)",
+            "Ji, haan, main ras dhoondh leta hoon",
+            "Main kash yoon leta hoon ki bas jhoom leta hoon",
+            "Main dwaapar yug mein treta hoon, main swag ka vikreta hoon",
+            "Main har bala ki jad bhi hoon, dava, duaa, asar bhi hoon",
+            "Main swarn ki asarfi hoon jo khota sikka ho gaya",
+            "Main swarn ki asarfi hoon bitar chuke itihaas mein",
+            "Jo har diwaan-e-khaas mein har aadmi ki aas thi",
+            "Kya laazmi hai trasdi kuch aisi, ki aisi ki taisi asarfi ki ho gyi",
+            "Yeah, zindagi kya tease hai, khada kara ke so gayi",
+            "Main bas hilata reh gaya, main bas hilata reh gaya",
+            "Main bas hilata reh gaya, main bas hilata reh gaya",
+            "Main kab sharabi ho gaya, mujhe koi khabar nahi",
+            "Main khud ka saaqi ho gaya, mujhe koi sharam nahi",
+            "Yeh kaisa swayamsaki hoon, gazab ka sabyasaachi hoon",
+            "Picture ki tarah baaki hoon",
+            "god mein jagah de, sirhaana bana de",
+            "Mere man mein hai shor",
+            "Shor, shor, shor",
+            "Mere man mein hai shor",
+            "Mama, I'm a wild child",
+            "So hold my hand",
+            "(Hold my hand, mama, hold my hand)",
+            "Yeah, haan, maine liye pahad tod",
+            "Ab bas baaki hain kuch crore, jaanein taaki sab chhor, chhor",
+            "Tera chhora kaafi hai faad, tera chhora kaafi hai fod",
+            "Chinta chhore ki, yaar, chhod, chhora chhoron mein mard hai",
+            "Chhora masti mein mast bhi, khole partein astitva ki",
+            "\"Phuke-phuke rehte ho\", saare humko kehte hain",
+            "\"Just keep it movin', baby\", hum saaron se kehte hain",
+            "Wolfie, koyi plan bana le, kab tak khula batkega?",
+            "Hum kehte hum toh aise jab tak lulla latkega",
+            "That's what's up, man, yeah",
+            "She hold my hand",
+            "She hold my hand",
+            "She hold my hand, yeah",
+            "She hold my hand",
+            "God mein jagah de, sirhaana bana de",
+            "Mere man mein hai shor",
+            "Shor, shor, shor",
+            "Mere man mein hai shor",
+            "Mama, I'm a wild child",
+            "So hold my hand",
+            "Yeah",
+            "I'm a high tier taxpayer, rap slayer, goofball",
+            "Had a heart of gold, now it's broken, I'm a douchebag",
+            "Gettin' out of house, just to throw away my weed, dawg",
+            "Same way I cut away the people I don't need, dawg, yeah",
+            "Joy has died a long time ago, now I'm tryna kill the sorrows too",
+            "My morrow's blue",
+            "Well, I'm a morose dude",
+            "And it don't help at all that sometimes I feel like a moron too",
+            "Like I love Raj Comics, wish for Zohan 2",
+            "I'm a lowbrow dude",
+            "Never motivated, lest my back against the wall, bitch",
+            "Not the kinda guy that you have sex against the wall with",
+            "Honest like a toddler who ain't caught up in the world yet",
+            "Plus, I'm on that walking talk shit",
+            "Super eclectic, slightly talented and highly neglected",
+            "You ain't ever seen nothin' like this, the name's cryman, wolf.cryman",
+            "She hold my hand",
+            "She hold my hand",
+            "She hold my hand",
+            "She hold my hand",
+            "She hold my-",
+          ],
+        },
+        {
+          title: "Until I Found You",
+          artist: "Stephen Sanchez",
+          src: "Until I Found You.mp3",
+          cover: "5.jpg",
+          synced: true,
+          lyrics: [
+            { time: 10.6, text: "Georgia, Wrap me up in all your..." },
+            { time: 17.0, text: "I want ya', In my arms" },
+            { time: 22.4, text: "Oh, let me hold ya'" },
+            {
+              time: 27.8,
+              text: "I'll never let you go again, like I did",
+            },
+            { time: 33.4, text: "Oh I used to say" },
+            {
+              time: 37.4,
+              text:
+                "\"I would never fall in love again until I found her\"",
+            },
+            {
+              time: 44.2,
+              text:
+                "I said, \"I would never fall unless it's you I fall into\"",
+            },
+            {
+              time: 51.4,
+              text: "I was lost within the darkness, but then I found her",
+            },
+            { time: 58.2, text: "I found you" },
+            {
+              time: 67.7,
+              text: "Georgia, Pulled me in, I asked to...",
+            },
+            { time: 74.4, text: "Love her, once again" },
+            { time: 79.5, text: "You fell, I caught ya'" },
+            {
+              time: 83.3,
+              text: "I'll never let you go again, like I did",
+            },
+            { time: 90.7, text: "Oh I used to say" },
+            {
+              time: 94.2,
+              text:
+                "\"I would never fall in love again until I found her\"",
+            },
+            {
+              time: 101.3,
+              text:
+                "I said, \"I would never fall unless it's you I fall into\"",
+            },
+            {
+              time: 108.4,
+              text: "I was lost within the darkness, but then I found her",
+            },
+            { time: 115.2, text: "I found you" },
+            {
+              time: 136.8,
+              text:
+                "\"I would never fall in love again until I found her\"",
+            },
+            {
+              time: 144.0,
+              text:
+                "I said, \"I would never fall unless it's you I fall into\"",
+            },
+            {
+              time: 151.2,
+              text: "I was lost within the darkness, but then I found her",
+            },
+            { time: 157.9, text: "I found you" },
+          ],
+        },
+      ];
+
+      let currentIndex = 0;
+      const audio = document.getElementById("audioPlayer");
+      const playBtn = document.getElementById("playBtn");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const progressBar = document.getElementById("progressBar");
+      const progressFill = document.getElementById("progressFill");
+      const currentTimeEl = document.getElementById("currentTime");
+      const durationEl = document.getElementById("duration");
+      const songTitle = document.getElementById("songTitle");
+      const songArtist = document.getElementById("songArtist");
+      const errorMessage = document.getElementById("errorMessage");
+      const lyricsSection = document.getElementById("lyricsSection");
+      const lyricsContainer = document.getElementById("lyricsContainer");
+      const lyricsToggle = document.getElementById("lyricsToggle");
+      const whySection = document.getElementById("whySection");
+      const whyToggle = document.getElementById("whyToggle");
+      const albumArt = document.getElementById("albumArt");
+      const whyText = document.getElementById("whyText");
+
+      function formatTime(seconds) {
+        if (!seconds || isNaN(seconds)) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+      }
+
+      function renderLyrics() {
+        lyricsContainer.innerHTML = "";
+        const song = playlist[currentIndex];
+
+        if (!song.lyrics || song.lyrics.length === 0) {
+          const p = document.createElement("p");
+          p.className = "lyrics-empty";
+          p.textContent =
+            "Add lyrics for this song in the playlist data.";
+          lyricsContainer.appendChild(p);
+          return;
+        }
+
+        if (song.synced) {
+          // clickable synced lines
+          song.lyrics.forEach((line) => {
+            const div = document.createElement("div");
+            div.className = "lyric-line synced";
+            div.dataset.time = line.time;
+            div.textContent = line.text;
+
+            div.addEventListener("click", () => {
+              if (audio.duration && typeof line.time === "number") {
+                audio.currentTime = line.time;
+              }
+            });
+
+            lyricsContainer.appendChild(div);
+          });
+        } else {
+          // normal lyrics (no seeking)
+          song.lyrics.forEach((text) => {
+            const div = document.createElement("div");
+            div.className = "lyric-line";
+            if (text.trim() === "") {
+              div.innerHTML = "&nbsp;";
+            } else {
+              div.textContent = text;
+            }
+            lyricsContainer.appendChild(div);
+          });
+        }
+      }
+
+      function highlightCurrentLyric(currentTime) {
+        const song = playlist[currentIndex];
+        if (!song.synced || !song.lyrics || song.lyrics.length === 0) return;
+
+        const lines = lyricsContainer.querySelectorAll(".lyric-line.synced");
+        if (!lines.length) return;
+
+        let activeIndex = -1;
+        for (let i = 0; i < song.lyrics.length; i++) {
+          const lineTime = song.lyrics[i].time;
+          if (typeof lineTime === "number" && currentTime >= lineTime) {
+            activeIndex = i;
+          } else if (typeof lineTime === "number" && currentTime < lineTime) {
+            break;
+          }
+        }
+
+        lines.forEach((line, index) => {
+          if (index === activeIndex) {
+            if (!line.classList.contains("active")) {
+              line.classList.add("active");
+              line.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+              });
+            }
+          } else {
+            line.classList.remove("active");
+          }
+        });
+      }
+
+      function updateLayoutMode() {
+        const isLyricsOn = lyricsToggle.checked;
+        const isWhyOn = whyToggle.checked;
+
+        // reset classes
+        document.body.classList.remove("lyrics-main-mode", "feels-main-mode");
+
+        // visibility
+        lyricsSection.style.display = isLyricsOn ? "block" : "none";
+        whySection.style.display = isWhyOn ? "block" : "none";
+
+        // modes:
+        // only lyrics -> lyrics main
+        if (isLyricsOn && !isWhyOn) {
+          document.body.classList.add("lyrics-main-mode");
+        }
+        // only feels -> feels main
+        else if (!isLyricsOn && isWhyOn) {
+          document.body.classList.add("feels-main-mode");
+        }
+        // both on -> lyrics main, feels below as card
+        else if (isLyricsOn && isWhyOn) {
+          document.body.classList.add("lyrics-main-mode");
+        }
+      }
+
+      function loadSong(index) {
+        currentIndex = index;
+        const song = playlist[currentIndex];
+
+        songTitle.textContent = song.title;
+        songArtist.textContent = song.artist;
+        audio.src = song.src;
+
+        // change album art per song
+        if (song.cover) {
+          albumArt.src = song.cover;
+          albumArt.alt = song.title + " cover";
+        }
+
+        progressFill.style.width = "0%";
+        currentTimeEl.textContent = "0:00";
+        durationEl.textContent = "0:00";
+        errorMessage.style.display = "none";
+
+        // Update lyrics
+        renderLyrics();
+        lyricsContainer.scrollTop = 0;
+
+        // Update "why it feels like us/you"
+        const feeling =
+          feelingsByTitle[song.title] ||
+          "Add your little note here about why this song feels like “us/you”.";
+        whyText.textContent = feeling;
+
+        // keep layout in sync with toggles
+        updateLayoutMode();
+      }
+
+      function togglePlay() {
+        if (audio.paused) {
+          audio
+            .play()
+            .then(() => {
+              playBtn.textContent = "❚❚";
+            })
+            .catch((error) => {
+              console.error("Playback failed:", error);
+              errorMessage.style.display = "block";
+              playBtn.textContent = "►";
+            });
+        } else {
+          audio.pause();
+          playBtn.textContent = "►";
+        }
+      }
+
+      function playNext() {
+        loadSong((currentIndex + 1) % playlist.length);
+        audio
+          .play()
+          .then(() => {
+            playBtn.textContent = "❚❚";
+          })
+          .catch(() => {
+            playBtn.textContent = "►";
+          });
+      }
+
+      function playPrev() {
+        loadSong((currentIndex - 1 + playlist.length) % playlist.length);
+        audio
+          .play()
+          .then(() => {
+            playBtn.textContent = "❚❚";
+          })
+          .catch(() => {
+            playBtn.textContent = "►";
+          });
+      }
+
+      playBtn.addEventListener("click", togglePlay);
+      nextBtn.addEventListener("click", playNext);
+      prevBtn.addEventListener("click", playPrev);
+
+      audio.addEventListener("timeupdate", () => {
+        const currentTime = audio.currentTime;
+        const duration = audio.duration;
+
+        if (duration) {
+          const progress = (currentTime / duration) * 100;
+          progressFill.style.width = `${progress}%`;
+          durationEl.textContent = formatTime(duration);
+        }
+
+        currentTimeEl.textContent = formatTime(currentTime);
+
+        // synced lyrics highlight
+        highlightCurrentLyric(currentTime);
+      });
+
+      audio.addEventListener("ended", () => {
+        playNext();
+      });
+
+      audio.addEventListener("pause", () => {
+        playBtn.textContent = "►";
+      });
+
+      audio.addEventListener("play", () => {
+        playBtn.textContent = "❚❚";
+      });
+
+      progressBar.addEventListener("click", (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = clickX / rect.width;
+
+        if (audio.duration) {
+          audio.currentTime = audio.duration * percentage;
+        }
+      });
+
+      // Toggles -> update layout + visibility
+      lyricsToggle.addEventListener("change", updateLayoutMode);
+      whyToggle.addEventListener("change", updateLayoutMode);
+
+      // Load first song on page load
+      loadSong(0);
+    </script>
+
+    <!-- Cloudflare script from original -->
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'9a7403c27398b2c8',t:'MTc2NDYwNzEwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
